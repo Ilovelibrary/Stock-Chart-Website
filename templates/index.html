@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title> Stock Listings </title>
+	<link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css">
+	<link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
+</head>
+<body>
+<div class="container">
+	<div class="header">
+		<h1>Stock Listings</h1>
+	</div>
+	<div class="row">
+		{% for s in stocks %}
+		<div class="card col-xs-6 col-sm-4 col-md-3">
+			<a href="{{url_for('chart', ticker = s)}}">
+				<h4 class="card-text">
+					{{s}}
+				</h4>
+			</a>
+		</div>
+		{% endfor %}
+	</div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Charts</title>
+	<link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
+	<link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
+</head>
+
+<body>
+<div class="container">
+	<div class="header">
+		<h1>Stock Chart</h1>
+	</div>
+	<canvas id="myChart" width="200" height="100"></canvas>
+</div>
+<script>
+	var ctx = document.getElementById("myChart").getContext('2d');
+	var dates = JSON.parse('{{ dates | tojson | safe}}');
+	var prices = JSON.parse('{{ prices | tojson | safe}}');
+	var movingAverages = JSON.parse('{{ movingAverages | tojson | safe}}');
+	
+	var data = {
+		labels: dates,
+		datasets: [{
+			fill: false,
+			label: 'End-of-Day Price',
+			data: prices,
+			borderColor: '#fe8b36',
+			backgroundColor: '#fe8b36',
+			borderWidth: 1,
+			pointRadius: 0,
+			pointBorderWidth: 0,
+		}, {
+			fill: false,
+			label: '100-Day Moving Average',
+			data: movingAverages,
+			borderColor: '#444',
+			backgroundColor: '#444',
+			borderWidth: 1,
+			pointRadius: 0,
+			pointBorderWidth: 0,
+		}]
+	};
+	var myChart = new Chart(ctx, {
+		type: 'line',
+		data: data,
+		options: {
+			scales: {
+				xAxes: [{
+					display: true,
+					scaleLabel: {
+						display: true,
+						labelString: "Date",
+					}
+				}],
+				yAxes: [{
+					scaleLabel: {
+						display: true,
+						labelString: "Price",
+					}
+				}]
+			}
+		}
+	});
+</script>
+  
+</body>
+</html>
