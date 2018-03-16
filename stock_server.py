@@ -1,5 +1,7 @@
 from flask import Flask, render_template
 import pandas as pd
+import datetime
+import numpy as np
 
 import quandl
 quandl.ApiConfig.api_key = "zC992yeEkw5VTye5PFJY"
@@ -26,12 +28,16 @@ def chart(ticker):
         'WIKI/PRICES',
         qopts={'columns': ['ticker', 'date', 'close']},
         ticker=[ticker],
-        date={'gte': '2016-01-01'}
+        date={'gte': '2017-01-01'}
         )
     
     # convert timestamp into string time of format 'YYYY-MM-DD'
     data['date'] = pd.to_datetime(data['date'], unit='d')
     dates = data['date'].dt.strftime('%Y-%m-%d').tolist()
+    nextday = datetime.datetime.now()
+    for i in range(20):
+        nextday = nextday + datetime.timedelta(days=1)
+        dates.append(nextday.strftime('%Y-%m-%d'))
     prices = data['close'].tolist()
     
     # calculate the moving average
@@ -50,7 +56,25 @@ def chart(ticker):
             mean_moving = mean_moving-prices[i-50]/100+prices[i+50]/100
             movingAverages[i] = mean_moving
     
-    return render_template('chart.html', dates=dates, prices=prices, movingAverages=movingAverages)
+    # prediction for the following 20 days with linear model
+    A, b = 0, 0
+    prices_temp = prices[-200:]
+    for i in range(len(prices_temp)-20):
+        x = np.array(prices_temp[i:i+20])
+        y = prices_temp[i+20]
+        A1 = x[:, np.newaxis]*x[np.newaxis, :]
+        A = A + A1
+        b1 = x * y
+        b = b + b1
+    w = np.linalg.inv(A).dot(b)
+    
+    predictions = prices_temp
+    for i in range(20):
+        next = np.array(predictions[-20:]).dot(w)
+        predictions.append(next)
+    predictions = predictions[-20:]
+    
+    return render_template('chart.html', dates=dates, prices=prices, movingAverages=movingAverages, predictions = predictions)
 
 if __name__ == '__main__':
     app.secret_key = 'super-secret-key'

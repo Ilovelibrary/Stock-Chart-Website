@@ -20,7 +20,11 @@
 	var dates = JSON.parse('{{ dates | tojson | safe}}');
 	var prices = JSON.parse('{{ prices | tojson | safe}}');
 	var movingAverages = JSON.parse('{{ movingAverages | tojson | safe}}');
-	
+	var predictions = JSON.parse('{{ predictions | tojson | safe}}');
+	const N = prices.length;
+	var pred = new Array(N);
+	pred[N-1] = prices[N-1]
+	pred = pred.concat(predictions);
 	var data = {
 		labels: dates,
 		datasets: [{
@@ -39,6 +43,15 @@
 			borderColor: '#444',
 			backgroundColor: '#444',
 			borderWidth: 1,
+			pointRadius: 0,
+			pointBorderWidth: 0,
+		},{
+			fill: true,
+			label: '20-Day Simple Predictions',
+			data: pred,
+			borderColor: '#ff0000',
+			backgroundColor: '#eee',
+			borderWidth: 3,
 			pointRadius: 0,
 			pointBorderWidth: 0,
 		}]
